@@ -1,0 +1,22 @@
+#!/bin/bash
+
+POKEMONS=(bulbasaur ivysaur venusaur charmander charmeleon)
+DIR="pokemon_data_parallel"
+mkdir -p "$DIR"
+
+fetch_pokemon() {
+    local name=$1
+    curl -s "https://pokeapi.co/api/v2/pokemon/$name" -o "$DIR/${name}.json"
+    if [ $? -eq 0 ]; then
+        echo "✅ $name downloaded"
+    else
+        echo "❌ Failed to fetch $name" >> errors.txt
+    fi
+}
+
+for pokemon in "${POKEMONS[@]}"; do
+    fetch_pokemon "$pokemon" &
+done
+
+wait
+echo "All downloads completed."
