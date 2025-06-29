@@ -1,0 +1,16 @@
+#!/bin/bash
+
+POKEMONS=(bulbasaur ivysaur venusaur charmander charmeleon)
+DIR="pokemon_data"
+mkdir -p "$DIR"
+
+for pokemon in "${POKEMONS[@]}"; do
+    echo "Fetching data for $pokemon..."
+    curl -s "https://pokeapi.co/api/v2/pokemon/$pokemon" -o "$DIR/${pokemon}.json"
+    if [ $? -eq 0 ]; then
+        echo "Saved data to $DIR/${pokemon}.json ✅"
+    else
+        echo "Error fetching $pokemon" >> errors.txt
+    fi
+    sleep 1  # Rate limiting
+done
