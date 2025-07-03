@@ -6,11 +6,26 @@ mkdir -p "$DIR"
 
 for pokemon in "${POKEMONS[@]}"; do
     echo "Fetching data for $pokemon..."
-    curl -s "https://pokeapi.co/api/v2/pokemon/$pokemon" -o "$DIR/${pokemon}.json"
-    if [ $? -eq 0 ]; then
-        echo "Saved data to $DIR/${pokemon}.json ✅"
-    else
-        echo "Error fetching $pokemon" >> errors.txt
+
+    max_retries=3
+    attempt=1
+
+    while [ $attempt -le $max_retries ]; do
+        curl -s "https://pokeapi.co/api/v2/pokemon/$pokemon" -o "$DIR/${pokemon}.json"
+
+        if [ $? -eq 0 ]; then
+            echo "Saved data to $DIR/${pokemon}.json ✅"
+            break
+        else
+            echo "Attempt $attempt failed for $pokemon"
+            ((attempt++))
+            sleep 1
+        fi
+    done
+
+    if [ $attempt -gt $max_retries ]; then
+        echo "Failed to fetch $pokemon after 3 attempts" >> errors.txt
     fi
-    sleep 1  # Rate limiting
+
+    sleep 1
 done
