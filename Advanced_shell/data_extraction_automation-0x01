@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DATA_FILE="data.json"
+
+# Use jq to extract values from JSON
+name=$(jq -r '.name' "$DATA_FILE")
+type=$(jq -r '.types[0].type.name' "$DATA_FILE")
+height=$(jq -r '.height' "$DATA_FILE")
+weight=$(jq -r '.weight' "$DATA_FILE")
+
+# Use sed to capitalize
+name=$(echo "$name" | sed 's/.*/\u&/')
+type=$(echo "$type" | sed 's/.*/\u&/')
+
+# Use awk to convert units
+formatted_height=$(awk "BEGIN { printf \"%.1f\", $height / 10 }")
+formatted_weight=$(awk "BEGIN { printf \"%.0f\", $weight / 10 }")
+
+# Echo in the exact format and with the required variable names
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
